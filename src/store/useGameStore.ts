@@ -7,8 +7,8 @@ export type PieceType = "pawn" | "rook" | "bishop" | "knight" | "queen" | "king"
 export interface Tile {
   type: TileType;
   position: [number, number];
-  pieceType?: PieceType; // for enemies
-  hp?: number; // for enemies
+  pieceType?: PieceType;
+  hp?: number;
 }
 
 export interface PlayerPiece {
@@ -50,90 +50,94 @@ export const useGameStore = create<GameState>((set, get) => ({
   message: "",
   levelCompleted: false,
 
-  setMessage: (msg: string) => set({ message: msg }),
+  setMessage: (msg) => set({ message: msg }),
 
   initBoard: (size = 8) => {
+    const level = get().level;
+    const existingPieces = get().playerPieces;
+
+    // Create empty board
     const board: Tile[][] = Array.from({ length: size }, (_, y) =>
       Array.from({ length: size }, (_, x) => ({ type: "floor", position: [x, y] as [number, number] }))
     );
 
-    const randCoord = (): [number, number] => [Math.floor(Math.random() * size), Math.floor(Math.random() * size)];
+    const randCoord = (): [number, number] => [
+      Math.floor(Math.random() * size),
+      Math.floor(Math.random() * size),
+    ];
 
-    // walls
-    const wallCount = Math.floor(size * size * 0.15);
-    for (let i = 0; i < wallCount; i++) {
+    // Walls
+    for (let i = 0; i < Math.floor(size * size * 0.15); i++) {
       const [x, y] = randCoord();
       if (board[y][x].type === "floor") board[y][x].type = "wall";
     }
 
-    // enemies
-    const enemyCount = Math.floor(size * size * 0.1);
-    for (let i = 0; i < enemyCount; i++) {
+    // Enemies
+    for (let i = 0; i < Math.floor(size * size * 0.1); i++) {
       const [x, y] = randCoord();
-      if (board[y][x].type !== "floor") continue;
-      board[y][x].type = "enemy";
-      board[y][x].pieceType = "pawn";
-      board[y][x].hp = 1;
+      if (board[y][x].type === "floor") {
+        board[y][x].type = "enemy";
+        board[y][x].pieceType = "pawn";
+        board[y][x].hp = 1;
+      }
     }
 
-    // loot
-    const lootCount = Math.floor(size * size * 0.05);
-    for (let i = 0; i < lootCount; i++) {
+    // Loot
+    for (let i = 0; i < Math.floor(size * size * 0.05); i++) {
       const [x, y] = randCoord();
-      if (board[y][x].type !== "floor") continue;
-      board[y][x].type = "loot";
+      if (board[y][x].type === "floor") board[y][x].type = "loot";
     }
 
-    // place all existing player pieces on the board
+    // Player pieces
+    const pieces: PlayerPiece[] =
+      existingPieces.length > 0
+        ? existingPieces.map((p) => {
+          let nx = 0,
+            ny = 0,
+            placed = false;
+          while (!placed) {
+            nx = Math.floor(Math.random() * size);
+            ny = Math.floor(Math.random() * size);
+            if (board[ny][nx].type === "floor") {
+              board[ny][nx].type = "player";
+              placed = true;
+            }
+          }
+          return { ...p, position: [nx, ny] };
+        })
+        : [
+          {
+            pieceType: "knight",
+            health: 10,
+            maxHealth: 10,
+            position: [0, 0],
+          },
+        ];
 
-    const updatedPieces: PlayerPiece[] = get().playerPieces.length
-      ? get().playerPieces.map(p => {
-        let nx = p.position[0];
-        let ny = p.position[1];
-        let placed = false;
-        while (!placed) {
-          nx = Math.floor(Math.random() * size);
-          ny = Math.floor(Math.random() * size);
-          if (board[ny][nx].type === "floor") placed = true;
-        }
-        board[ny][nx].type = "player";
-        return { ...p, position: [nx, ny] } as PlayerPiece; // <- cast here
-      })
-      : [
-        {
-          pieceType: "knight", // explicitly allowed
-          health: 10,
-          maxHealth: 10,
-          position: [0, 0],
-        } as PlayerPiece,
-      ];
-
-
-    // mark board for new pieces
-    updatedPieces.forEach(p => (board[p.position[1]][p.position[0]].type = "player"));
+    // Mark them on board
+    pieces.forEach((p) => (board[p.position[1]][p.position[0]].type = "player"));
 
     set({
       board,
-      playerPieces: updatedPieces,
+      playerPieces: pieces,
       activePieceIndex: null,
       moveCount: 0,
-      maxMoves: 5 + get().level * 5,
+      maxMoves: 15 + level * 5,
       status: "playing",
       levelCompleted: false,
       message: "",
     });
   },
 
-  selectPlayerPiece: index => {
-    const { playerPieces, status } = get();
+  selectPlayerPiece: (index) => {
+    const { status } = get();
     if (status !== "playing") return;
-    if (index < 0 || index >= playerPieces.length) return;
     set({ activePieceIndex: index });
   },
 
   moveActivePieceTo: (nx, ny) => {
-    const { activePieceIndex, playerPieces, board, coins, moveCount, maxMoves, status } = get();
-    if (status !== "playing" || activePieceIndex === null) return;
+    const { activePieceIndex, playerPieces, board, coins, moveCount, maxMoves } = get();
+    if (activePieceIndex === null) return;
 
     const piece = playerPieces[activePieceIndex];
     const validMoves = getValidMoves(piece.pieceType, piece.position, board);
@@ -141,54 +145,51 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     const [x, y] = piece.position;
     const target = board[ny][nx];
-    const newPlayerPieces = [...playerPieces];
+    const newPieces = [...playerPieces];
 
     switch (target.type) {
-      case "floor":
-        get().setMessage("");
-        break;
       case "enemy":
         board[ny][nx].type = "floor";
-        newPlayerPieces[activePieceIndex].health -= 1;
+        newPieces[activePieceIndex].health -= 1;
         set({ coins: coins + 1 });
-        get().setMessage("You killed an enemy! -1 HP, +1 coin");
+        get().setMessage("Enemy defeated! -1 HP, +1 coin");
         break;
       case "loot":
         board[ny][nx].type = "floor";
-        newPlayerPieces[activePieceIndex].health = Math.min(
-          newPlayerPieces[activePieceIndex].health + 2,
-          newPlayerPieces[activePieceIndex].maxHealth
+        newPieces[activePieceIndex].health = Math.min(
+          newPieces[activePieceIndex].health + 2,
+          newPieces[activePieceIndex].maxHealth
         );
         set({ coins: coins + 2 });
-        get().setMessage("You picked up loot! +2 HP, +2 coins");
+        get().setMessage("You found loot! +2 HP, +2 coins");
         break;
     }
 
     board[y][x].type = "floor";
     board[ny][nx].type = "player";
-    newPlayerPieces[activePieceIndex].position = [nx, ny];
+    newPieces[activePieceIndex].position = [nx, ny];
 
     const newMoveCount = moveCount + 1;
-    let newStatus: GameState["status"] = "playing";
+    let status: GameState["status"] = "playing";
     let levelCompleted = false;
 
     if (newMoveCount >= maxMoves) {
-      newStatus = "lost";
-      get().setMessage("Out of moves! Game Over");
+      status = "lost";
+      get().setMessage("Out of moves! Game Over.");
     }
 
-    const enemiesLeft = board.flat().some(tile => tile.type === "enemy");
+    const enemiesLeft = board.flat().some((t) => t.type === "enemy");
     if (!enemiesLeft) {
-      newStatus = "shop";
+      status = "shop";
       levelCompleted = true;
-      get().setMessage("Level complete! Visit the shop to upgrade.");
+      get().setMessage("Level complete! Visit the shop.");
     }
 
     set({
       board,
-      playerPieces: newPlayerPieces,
+      playerPieces: newPieces,
       moveCount: newMoveCount,
-      status: newStatus,
+      status,
       levelCompleted,
       activePieceIndex: null,
     });
@@ -202,7 +203,6 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
 
     const size = board.length;
-    let placed = false;
     for (let y = 0; y < size; y++) {
       for (let x = 0; x < size; x++) {
         if (board[y][x].type === "floor") {
@@ -213,23 +213,22 @@ export const useGameStore = create<GameState>((set, get) => ({
             playerPieces: [...playerPieces, newPiece],
           });
           get().setMessage(`You bought a ${piece}!`);
-          placed = true;
-          break;
+          return;
         }
       }
-      if (placed) break;
     }
-
-    if (!placed) get().setMessage("No space to place new piece!");
+    get().setMessage("No space to place new piece!");
   },
 
   startNextLevel: () => {
-    set({ level: get().level + 1, status: "playing", levelCompleted: false });
+    set({ level: get().level + 1, status: "playing" });
     get().initBoard();
   },
 
   restartLevel: () => {
     set({
+      level: 1,
+      coins: 0,
       playerPieces: [
         {
           pieceType: "knight",
@@ -238,12 +237,6 @@ export const useGameStore = create<GameState>((set, get) => ({
           position: [0, 0],
         },
       ],
-      activePieceIndex: null,
-      moveCount: 0,
-      status: "playing",
-      message: "Level restarted",
-      coins: 0,
-      levelCompleted: false,
     });
     get().initBoard();
   },

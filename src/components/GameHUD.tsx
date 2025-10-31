@@ -16,33 +16,29 @@ export default function GameHUD() {
 
   if (status === "menu") return null;
 
-  const activePiece = activePieceIndex !== null ? playerPieces[activePieceIndex] : null;
-
   return (
-    <div className="w-full p-4 bg-gray-800 text-white flex flex-col gap-2">
-      <div className="flex justify-between items-center">
-        <div>
-          <span className="font-bold">Level:</span> {level}
-        </div>
-        <div>
-          <span className="font-bold">Coins:</span> {coins}
-        </div>
+    <div className="hud-panel w-72 h-full p-4 flex flex-col justify-between bg-hudBg border-2 border-accent font-retro text-green-400">
+
+      {/* Top section: Level and Coins */}
+      <div className="flex justify-between text-lg">
+        <span>LVL {level}</span>
+        <span>💰 {coins}</span>
       </div>
 
-      <div className="flex flex-col gap-1">
+      {/* Player pieces */}
+      <div className="flex flex-col gap-3 mt-4">
         {playerPieces.map((piece, i) => {
           const healthPercentage = (piece.health / piece.maxHealth) * 100;
           return (
             <div
               key={i}
-              className={`flex items-center gap-2 cursor-pointer ${activePieceIndex === i ? "bg-gray-700" : ""
-                }`}
+              className={`flex flex-col p-2 border-2 ${activePieceIndex === i ? "border-accent" : "border-gray-700"} cursor-pointer`}
               onClick={() => useGameStore.getState().selectPlayerPiece(i)}
             >
-              <div>{piece.pieceType}</div>
-              <div className="w-24 bg-gray-600 h-2 rounded overflow-hidden">
+              <span className="text-lg">{piece.pieceType.toUpperCase()}</span>
+              <div className="w-full h-4 bg-gray-900 border border-gray-700 mt-1">
                 <div
-                  className="h-2 bg-green-500"
+                  className="h-4 bg-green-500"
                   style={{ width: `${healthPercentage}%` }}
                 />
               </div>
@@ -51,18 +47,21 @@ export default function GameHUD() {
         })}
       </div>
 
-      <div>
-        <span className="font-bold">Moves:</span> {moveCount} / {maxMoves}
+      {/* Moves */}
+      <div className="border-t-2 border-accent pt-2 text-lg">
+        MOVES {moveCount}/{maxMoves}
       </div>
 
-      {message && <div className="mt-2 p-1 bg-gray-700 rounded">{message}</div>}
+      {/* Message */}
+      {message && <div className="text-yellow-300 text-lg mt-2">{message}</div>}
 
+      {/* Retry / Continue */}
       {(status === "lost" || status === "shop") && (
         <button
-          className="mt-2 px-4 py-2 bg-blue-600 rounded hover:bg-blue-700"
+          className="retro-button mt-4 w-full text-lg"
           onClick={() => useGameStore.getState().restartLevel()}
         >
-          {status === "lost" ? "Restart Level" : "Continue"}
+          {status === "lost" ? "RETRY" : "CONTINUE"}
         </button>
       )}
     </div>

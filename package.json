@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "framer-motion": "^12.23.24",
     "howler": "^2.2.4",
     "konva": "^10.0.8",
     "next": "16.0.1",
