@@ -6,7 +6,7 @@ import { ReactNode } from "react";
 interface Props {
   children: ReactNode;
   keyName: string;
-  className?: string; // Add className prop
+  className?: string;
 }
 
 export default function ScreenWrapper({ children, keyName, className = "" }: Props) {
@@ -18,7 +18,7 @@ export default function ScreenWrapper({ children, keyName, className = "" }: Pro
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -40 }}
         transition={{ duration: 0.5, ease: "easeInOut" }}
-        className={`flex flex-col items-center justify-center min-h-screen w-full ${className}`} // Apply className here
+        className={`flex flex-col items-center justify-center min-h-screen w-full ${className}`}
       >
         {children}
       </motion.div>

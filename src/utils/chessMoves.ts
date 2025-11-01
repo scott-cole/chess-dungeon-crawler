@@ -70,7 +70,6 @@ export function getValidMoves(
     }
 
     case "queen": {
-      // combine rook + bishop moves
       const rookMoves = getValidMoves("rook", position, board);
       const bishopMoves = getValidMoves("bishop", position, board);
       moves.push(...rookMoves, ...bishopMoves);
