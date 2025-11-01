@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { getValidMoves } from "@/utils/chessMoves";
 
 export type TileType = "floor" | "player" | "wall" | "enemy" | "health";
+export type PotionType = "health" | "wealth";
 export type PieceType = "pawn" | "rook" | "bishop" | "knight" | "queen" | "king";
 
 export interface Tile {
@@ -34,6 +35,7 @@ interface GameState {
   moveActivePieceTo: (nx: number, ny: number) => void;
   setMessage: (msg: string) => void;
   buyPiece: (piece: Exclude<PieceType, "pawn">, cost: number) => void;
+  buyPotion: (potion: PotionType, cost: number) => void;
   startNextLevel: () => void;
   restartLevel: () => void;
 }
@@ -179,6 +181,12 @@ export const useGameStore = create<GameState>((set, get) => ({
       get().setMessage("Level complete! Visit the shop.");
     }
 
+    // if piece has 0 health remove from play
+    const playerHealth = newPieces[activePieceIndex].health;
+    if (playerHealth < 1) {
+      newPieces.splice(activePieceIndex, 1);
+    }
+
     set({
       board,
       playerPieces: newPieces,
@@ -187,6 +195,13 @@ export const useGameStore = create<GameState>((set, get) => ({
       levelCompleted,
       activePieceIndex: null,
     });
+  },
+
+  buyPotion: (potion, cost) => {
+    const { coins } = get();
+    if (coins < cost) {
+      get().setMessage("No dollar my guy!");
+    }
   },
 
   buyPiece: (piece, cost) => {
