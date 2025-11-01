@@ -40,9 +40,9 @@ export default function GameBoard() {
     bishop: "♝",
     queen: "♛",
     king: "♚",
-    enemy: "💀",
+    enemy: "♙",
     loot: "💰",
-    wall: "🧱",
+    wall: "⛔",
   };
 
   return (
