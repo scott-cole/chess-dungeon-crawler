@@ -5,7 +5,7 @@ import { ReactNode } from "react";
 
 interface Props {
   children: ReactNode;
-  keyName: string; // unique key to trigger animation when screen changes
+  keyName: string;
 }
 
 export default function ScreenWrapper({ children, keyName }: Props) {

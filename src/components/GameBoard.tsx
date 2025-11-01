@@ -17,15 +17,13 @@ export default function GameBoard() {
     status,
   } = useGameStore();
 
-  const tileSize = 48; // small pixel-perfect size
+  const tileSize = 48;
   const boardBorder = 4;
 
-  // initialize board
   useEffect(() => {
     if (board.length === 0) initBoard(8);
   }, [board.length, initBoard]);
 
-  // calculate valid moves
   const validMoves = useMemo(() => {
     if (!board.length || activePieceIndex === null || !playerPieces[activePieceIndex]) return [];
     const piece = playerPieces[activePieceIndex];
@@ -63,15 +61,12 @@ export default function GameBoard() {
             fill="#000"
           />
 
-          {/* Tiles and pieces */}
           {board.flat().map((tile) => {
             const [tx, ty] = tile.position;
             const isValidMove = validMoves.some(([vx, vy]) => vx === tx && vy === ty);
 
-            // Background tiles
             const fill = (tx + ty) % 2 === 0 ? "#444" : "#999";
 
-            // Determine icon
             let iconText = "";
             if (tile.type === "enemy") iconText = icons.enemy;
             else if (tile.type === "loot") iconText = icons.loot;
@@ -104,7 +99,6 @@ export default function GameBoard() {
                   if (isValidMove) moveActivePieceTo(tx, ty);
                 }}
               >
-                {/* Tile */}
                 <Rect
                   x={tx * tileSize + boardBorder}
                   y={ty * tileSize + boardBorder}
@@ -115,7 +109,6 @@ export default function GameBoard() {
                   strokeWidth={isActivePiece || isValidMove ? 2 : 1}
                 />
 
-                {/* Piece / Icon */}
                 {iconText && (
                   <Text
                     text={iconText}

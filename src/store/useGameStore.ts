@@ -56,7 +56,6 @@ export const useGameStore = create<GameState>((set, get) => ({
     const level = get().level;
     const existingPieces = get().playerPieces;
 
-    // Create empty board
     const board: Tile[][] = Array.from({ length: size }, (_, y) =>
       Array.from({ length: size }, (_, x) => ({ type: "floor", position: [x, y] as [number, number] }))
     );
@@ -66,13 +65,11 @@ export const useGameStore = create<GameState>((set, get) => ({
       Math.floor(Math.random() * size),
     ];
 
-    // Walls
     for (let i = 0; i < Math.floor(size * size * 0.15); i++) {
       const [x, y] = randCoord();
       if (board[y][x].type === "floor") board[y][x].type = "wall";
     }
 
-    // Enemies
     for (let i = 0; i < Math.floor(size * size * 0.1); i++) {
       const [x, y] = randCoord();
       if (board[y][x].type === "floor") {
@@ -82,13 +79,11 @@ export const useGameStore = create<GameState>((set, get) => ({
       }
     }
 
-    // Loot
     for (let i = 0; i < Math.floor(size * size * 0.05); i++) {
       const [x, y] = randCoord();
       if (board[y][x].type === "floor") board[y][x].type = "loot";
     }
 
-    // Player pieces
     const pieces: PlayerPiece[] =
       existingPieces.length > 0
         ? existingPieces.map((p) => {
@@ -114,7 +109,6 @@ export const useGameStore = create<GameState>((set, get) => ({
           },
         ];
 
-    // Mark them on board
     pieces.forEach((p) => (board[p.position[1]][p.position[0]].type = "player"));
 
     set({
