@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { getValidMoves } from "@/utils/chessMoves";
 
-export type TileType = "floor" | "player" | "wall" | "enemy" | "loot";
+export type TileType = "floor" | "player" | "wall" | "enemy" | "health";
 export type PieceType = "pawn" | "rook" | "bishop" | "knight" | "queen" | "king";
 
 export interface Tile {
@@ -81,7 +81,7 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     for (let i = 0; i < Math.floor(size * size * 0.05); i++) {
       const [x, y] = randCoord();
-      if (board[y][x].type === "floor") board[y][x].type = "loot";
+      if (board[y][x].type === "floor") board[y][x].type = "health";
     }
 
     const pieces: PlayerPiece[] =
@@ -148,7 +148,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         set({ coins: coins + 1 });
         get().setMessage("Enemy defeated! -1 HP, +1 coin");
         break;
-      case "loot":
+      case "health":
         board[ny][nx].type = "floor";
         newPieces[activePieceIndex].health = Math.min(
           newPieces[activePieceIndex].health + 2,

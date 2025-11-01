@@ -1,9 +1,8 @@
-
 "use client";
 
-import { Stage, Layer, Rect, Text, Group } from "react-konva";
+import { Stage, Layer, Rect, Group, Image as KonvaImage } from "react-konva";
 import { useGameStore } from "@/store/useGameStore";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getValidMoves } from "@/utils/chessMoves";
 
 export default function GameBoard() {
@@ -17,8 +16,45 @@ export default function GameBoard() {
     status,
   } = useGameStore();
 
-  const tileSize = 48;
+  const tileSize = 64;
   const boardBorder = 4;
+
+  const [images, setImages] = useState<Record<string, HTMLImageElement>>({});
+
+  const pieceImages: Record<string, string> = {
+    white_pawn: "/white_pawn.png",
+    black_pawn: "/black_pawn.png",
+    white_knight: "/white_knight.png",
+    black_knight: "/black_knight.png",
+    white_rook: "/white_rook.png",
+    black_rook: "/black_rook.png",
+    white_bishop: "/white_bishop.png",
+    black_bishop: "/black_bishop.png",
+    white_queen: "/white_queen.png",
+    black_queen: "/black_queen.png",
+    white_king: "/white_king.png",
+    black_king: "/black_king.png",
+    health: "/health_pot.png",
+  };
+
+  useEffect(() => {
+    const loadImages = async () => {
+      const loadedImages: Record<string, HTMLImageElement> = {};
+
+      for (const [key, src] of Object.entries(pieceImages)) {
+        const img = new Image();
+        img.src = src;
+        img.onload = () => {
+          loadedImages[key] = img;
+          if (Object.keys(loadedImages).length === Object.keys(pieceImages).length) {
+            setImages(loadedImages);
+          }
+        };
+      }
+    };
+
+    loadImages();
+  }, []);
 
   useEffect(() => {
     if (board.length === 0) initBoard(8);
@@ -30,20 +66,9 @@ export default function GameBoard() {
     return getValidMoves(piece.pieceType, piece.position, board);
   }, [activePieceIndex, playerPieces, board]);
 
-  if (!board.length) return <div>Loading...</div>;
+  if (!board.length || !Object.keys(images).length) return <div>Loading...</div>;
 
   const boardDisabled = status !== "playing";
-
-  const icons = {
-    knight: "♞",
-    rook: "♜",
-    bishop: "♝",
-    queen: "♛",
-    king: "♚",
-    enemy: "♙",
-    loot: "💰",
-    wall: "⛔",
-  };
 
   return (
     <div className={`relative ${boardDisabled ? "opacity-50 pointer-events-none" : ""}`}>
@@ -52,13 +77,12 @@ export default function GameBoard() {
         height={board.length * tileSize + boardBorder * 2}
       >
         <Layer>
-          {/* Board border */}
           <Rect
             x={0}
             y={0}
             width={board[0].length * tileSize + boardBorder * 2}
             height={board.length * tileSize + boardBorder * 2}
-            fill="#000"
+            fill="#99a1af"
           />
 
           {board.flat().map((tile) => {
@@ -67,13 +91,18 @@ export default function GameBoard() {
 
             const fill = (tx + ty) % 2 === 0 ? "#444" : "#999";
 
-            let iconText = "";
-            if (tile.type === "enemy") iconText = icons.enemy;
-            else if (tile.type === "loot") iconText = icons.loot;
-            else if (tile.type === "wall") iconText = icons.wall;
-            else if (tile.type === "player") {
+            let pieceImage: HTMLImageElement | null = null;
+
+            if (tile.type === "enemy") {
+              pieceImage = images["black_pawn"];
+            } else if (tile.type === "health") {
+              pieceImage = images["health"];
+            } else if (tile.type === "wall") {
+            } else if (tile.type === "player") {
               const player = playerPieces.find((p) => p.position[0] === tx && p.position[1] === ty);
-              iconText = player ? icons[player.pieceType] : icons.knight;
+              if (player) {
+                pieceImage = images[`white_${player.pieceType}`];
+              }
             }
 
             const isActivePiece =
@@ -109,16 +138,16 @@ export default function GameBoard() {
                   strokeWidth={isActivePiece || isValidMove ? 2 : 1}
                 />
 
-                {iconText && (
-                  <Text
-                    text={iconText}
-                    fontSize={tileSize * 0.7}
+                {pieceImage && (
+                  <KonvaImage
+                    image={pieceImage}
                     width={tileSize}
                     height={tileSize}
-                    x={tx * tileSize + boardBorder}
-                    y={ty * tileSize + boardBorder}
-                    align="center"
-                    verticalAlign="middle"
+                    x={tx * tileSize + boardBorder + tileSize / 2}
+                    y={ty * tileSize + boardBorder + tileSize / 2}
+                    offsetX={tileSize / 2}
+                    offsetY={tileSize / 2}
+                    alt="Chess piece"
                   />
                 )}
               </Group>
@@ -129,4 +158,3 @@ export default function GameBoard() {
     </div>
   );
 }
-

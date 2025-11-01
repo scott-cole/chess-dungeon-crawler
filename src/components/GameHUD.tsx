@@ -17,10 +17,10 @@ export default function GameHUD() {
   if (status === "menu") return null;
 
   return (
-    <div className="hud-panel w-72 h-full p-4 flex flex-col justify-between bg-black border-4 border-yellow-400 text-white font-mono">
+    <div className="hud-panel w-72 h-full p-4 flex flex-col justify-between bg-black border-4 border-gray-400 text-white font-mono">
       <div className="flex justify-between text-sm mb-4">
         <span>LEVEL: {level}</span>
-        <span className="text-yellow-400 text-sm">COINS: {coins}</span>
+        <span className="text-sm">COINS: {coins}</span>
       </div>
 
       <div className="flex flex-col gap-4">
@@ -34,25 +34,28 @@ export default function GameHUD() {
               onClick={() => useGameStore.getState().selectPlayerPiece(i)}
             >
               <span className="text-lg">{piece.pieceType.toUpperCase()}</span>
-              <div className="w-full h-3 bg-gray-800 border border-gray-600 mt-2 rounded-sm">
-                <div
-                  className="h-3 rounded-sm"
-                  style={{
-                    width: `${healthPercentage}%`,
-                    backgroundColor: healthPercentage > 50 ? "#00FF00" : "#FF0000",
-                  }}
-                />
+              <div className="flex items-center mt-2">
+                <span className="text-sm">HP: </span>
+                <div className="w-full h-3 bg-gray-800 rounded-sm">
+                  <div
+                    className="h-3 rounded-sm"
+                    style={{
+                      width: `${healthPercentage}%`,
+                      backgroundColor: healthPercentage > 50 ? "#00FF00" : "#FF0000",
+                    }}
+                  />
+                </div>
               </div>
             </div>
           );
         })}
       </div>
 
-      <div className="pt-3 text-lg">
+      <div className="mt-8 text-lg">
         MOVES {moveCount}/{maxMoves}
       </div>
 
-      {message && <div className="text-yellow-300 text-sm mt-4">{message}</div>}
+      {message && <div className="text-sm mt-4">{message}</div>}
 
       {(status === "lost" || status === "shop") && (
         <button
