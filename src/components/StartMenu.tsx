@@ -25,7 +25,7 @@ export default function StartMenu() {
       </button>
 
       <div className="absolute bottom-6 text-gray-600 text-[8px]">
-        © 2025 Retro Chess Studio
+        © 2025 Bareknuckle indie game
       </div>
     </div>
   );
