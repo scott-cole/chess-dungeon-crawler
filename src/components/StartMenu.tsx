@@ -9,7 +9,7 @@ export default function StartMenu() {
 
   return (
     <div className="font-[var(--font-sans)] fixed inset-0 bg-black flex flex-col items-center justify-center text-center text-yellow-400 p-4">
-      <h1 className="text-3xl md:text-5xl text-red-500 mb-6">
+      <h1 className="text-3xl md:text-5xl text-gray-400 mb-6">
         CHESS DUNGEON
       </h1>
 
@@ -24,7 +24,7 @@ export default function StartMenu() {
         START GAME
       </button>
 
-      <div className="absolute bottom-6 text-gray-600 text-[8px]">
+      <div className="absolute bottom-6 text-gray-400 text-[8px]">
         © 2025 Bareknuckle indie game
       </div>
     </div>
