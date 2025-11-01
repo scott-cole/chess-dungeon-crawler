@@ -8,8 +8,8 @@ export default function StartMenu() {
   if (status !== "menu") return null;
 
   return (
-    <div className="fixed inset-0 bg-black flex flex-col items-center justify-center text-center text-yellow-400 font-[var(--font-retro)] p-4">
-      <h1 className="text-3xl md:text-5xl text-red-500 mb-6 pixel-outline">
+    <div className="font-[var(--font-sans)] fixed inset-0 bg-black flex flex-col items-center justify-center text-center text-yellow-400 p-4">
+      <h1 className="text-3xl md:text-5xl text-red-500 mb-6">
         CHESS DUNGEON
       </h1>
 
@@ -19,7 +19,7 @@ export default function StartMenu() {
 
       <button
         onClick={() => initBoard(8)}
-        className="retro-button px-6 py-3 text-sm md:text-base"
+        className="px-6 py-3 text-sm md:text-base"
       >
         START GAME
       </button>
@@ -30,5 +30,3 @@ export default function StartMenu() {
     </div>
   );
 }
-
-

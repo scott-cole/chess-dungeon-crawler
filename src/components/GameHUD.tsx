@@ -17,7 +17,7 @@ export default function GameHUD() {
   if (status === "menu") return null;
 
   return (
-    <div className="hud-panel w-72 h-full p-4 flex flex-col justify-between bg-hudBg border-2 border-accent font-retro text-green-400">
+    <div className="hud-panel w-72 h-full p-4 flex flex-col justify-between bg-hudBg border-2 border-accent text-green-400">
 
       {/* Top section: Level and Coins */}
       <div className="flex justify-between text-lg">
@@ -58,7 +58,7 @@ export default function GameHUD() {
       {/* Retry / Continue */}
       {(status === "lost" || status === "shop") && (
         <button
-          className="retro-button mt-4 w-full text-lg"
+          className="mt-4 w-full text-lg"
           onClick={() => useGameStore.getState().restartLevel()}
         >
           {status === "lost" ? "RETRY" : "CONTINUE"}

@@ -1,14 +1,11 @@
+
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Press_Start_2P } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const pressStart2P = Press_Start_2P({
+  weight: "400",
+  variable: "--font-press-start-2p",
   subsets: ["latin"],
 });
 
@@ -19,16 +16,21 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
-    </html>
+    <>
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+        />
+      </head>
+      <html lang="en">
+        <body className={`${pressStart2P.variable} font-[var(--font-press-start-2p)]`}>
+          {children}
+        </body>
+      </html>
+    </>
   );
 }
+
