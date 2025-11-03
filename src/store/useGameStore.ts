@@ -223,6 +223,14 @@ export const useGameStore = create<GameState>((set, get) => ({
       get().setMessage(`You bought a ${item} item`)
       return;
     }
+    else if (newItem.itemType === "wealth") {
+      set({
+        coins: coins - cost,
+        playerInventory: [...playerInventory, newItem],
+      });
+      get().setMessage(`You bought a ${item} item`)
+      return;
+    }
   },
 
   buyPiece: (piece, cost) => {
@@ -269,6 +277,8 @@ export const useGameStore = create<GameState>((set, get) => ({
     if (item.itemType === "health") {
       piece.health = Math.min(piece.health + 3, piece.maxHealth);
       get().setMessage(`${piece.pieceType.toUpperCase()} healed +3 HP!`);
+    } else if (item.itemType === "wealth") {
+      get().setMessage("This piece now earns double coins!!!");
     }
 
     set({

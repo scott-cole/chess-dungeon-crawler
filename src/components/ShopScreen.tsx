@@ -35,6 +35,12 @@ export default function ShopScreen() {
         >
           Buy Health Potion (5 coins)
         </button>
+        <button
+          onClick={() => buyItem("wealth", 5)}
+          className="px-4 py-2 bg-red-600 text-white rounded hover:bg-purple-700"
+        >
+          Buy Wealth Multi (x2) Potion (5 coins)
+        </button>
       </div>
       <button
         onClick={startNextLevel}

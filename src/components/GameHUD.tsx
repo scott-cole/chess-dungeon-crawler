@@ -17,6 +17,7 @@ export default function GameHUD() {
 
   const itemImages: Record<string, string> = {
     health: "/health_pot.png",
+    wealth: "/coins_pot.png",
   };
 
   if (status === "menu") return null;

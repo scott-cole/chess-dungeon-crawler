@@ -21,23 +21,24 @@ export default function GameBoard() {
 
   const [images, setImages] = useState<Record<string, HTMLImageElement>>({});
 
-  const pieceImages: Record<string, string> = {
-    white_pawn: "/white_pawn.png",
-    black_pawn: "/black_pawn.png",
-    white_knight: "/white_knight.png",
-    black_knight: "/black_knight.png",
-    white_rook: "/white_rook.png",
-    black_rook: "/black_rook.png",
-    white_bishop: "/white_bishop.png",
-    black_bishop: "/black_bishop.png",
-    white_queen: "/white_queen.png",
-    black_queen: "/black_queen.png",
-    white_king: "/white_king.png",
-    black_king: "/black_king.png",
-    health: "/health_pot.png",
-  };
 
   useEffect(() => {
+    const pieceImages: Record<string, string> = {
+      white_pawn: "/white_pawn.png",
+      black_pawn: "/black_pawn.png",
+      white_knight: "/white_knight.png",
+      black_knight: "/black_knight.png",
+      white_rook: "/white_rook.png",
+      black_rook: "/black_rook.png",
+      white_bishop: "/white_bishop.png",
+      black_bishop: "/black_bishop.png",
+      white_queen: "/white_queen.png",
+      black_queen: "/black_queen.png",
+      white_king: "/white_king.png",
+      black_king: "/black_king.png",
+      health: "/health_pot.png",
+    };
+
     const loadImages = async () => {
       const loadedImages: Record<string, HTMLImageElement> = {};
 
@@ -54,7 +55,7 @@ export default function GameBoard() {
     };
 
     loadImages();
-  }, [pieceImages]);
+  }, []);
 
   useEffect(() => {
     if (board.length === 0) initBoard(8);
