@@ -18,7 +18,7 @@ export interface Tile {
 export interface Items {
   itemType: ItemType;
   health?: number;
-  coins?: number;
+  wealth?: number;
 }
 
 export interface PlayerPiece {
@@ -26,6 +26,7 @@ export interface PlayerPiece {
   health: number;
   maxHealth: number;
   position: [number, number];
+  hasWealth?: boolean;
 }
 
 interface GameState {
@@ -39,6 +40,7 @@ interface GameState {
   maxMoves: number;
   coins: number;
   message: string;
+  hasWealth: boolean;
   levelCompleted: boolean;
   initBoard: (size?: number) => void;
   selectPlayerPiece: (index: number) => void;
@@ -51,6 +53,7 @@ interface GameState {
   restartLevel: () => void;
 }
 
+
 export const useGameStore = create<GameState>((set, get) => ({
   board: [],
   playerPieces: [],
@@ -62,6 +65,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   maxMoves: 20,
   coins: 0,
   message: "",
+  hasWealth: false,
   levelCompleted: false,
 
   setMessage: (msg) => set({ message: msg }),
@@ -143,6 +147,40 @@ export const useGameStore = create<GameState>((set, get) => ({
     set({ activePieceIndex: index });
   },
 
+
+  useItem: (itemIndex: number) => {
+    const { playerInventory, playerPieces, activePieceIndex } = get();
+
+    if (activePieceIndex === null) {
+      get().setMessage("Select a piece first!");
+      return;
+    }
+
+    const item = playerInventory[itemIndex];
+    if (!item) return;
+
+    const newInventory = [...playerInventory];
+    newInventory.splice(itemIndex, 1);
+
+    const newPieces = [...playerPieces];
+    const piece = newPieces[activePieceIndex];
+
+    if (item.itemType === "health") {
+      piece.health = Math.min(piece.health + 3, piece.maxHealth);
+      get().setMessage(`${piece.pieceType.toUpperCase()} healed +3 HP!`);
+    } else if (item.itemType === "wealth") {
+      piece.hasWealth = true;
+      get().setMessage(`${piece.pieceType.toUpperCase()} now earns double coins!`);
+    }
+
+    set({
+      playerInventory: newInventory,
+      playerPieces: newPieces,
+    });
+  },
+
+
+
   moveActivePieceTo: (nx, ny) => {
     const { activePieceIndex, playerPieces, board, coins, moveCount, maxMoves } = get();
     if (activePieceIndex === null) return;
@@ -159,17 +197,19 @@ export const useGameStore = create<GameState>((set, get) => ({
       case "enemy":
         board[ny][nx].type = "floor";
         newPieces[activePieceIndex].health -= 1;
-        set({ coins: coins + 1 });
-        get().setMessage("Enemy defeated! -1 HP, +1 coin");
+
+        const reward = piece.hasWealth ? 2 : 1;
+        set({ coins: coins + reward });
+        get().setMessage(`Enemy defeated! -1 HP, +${reward} coin${reward > 1 ? "s" : ""}`);
         break;
+
       case "health":
         board[ny][nx].type = "floor";
         newPieces[activePieceIndex].health = Math.min(
           newPieces[activePieceIndex].health + 2,
           newPieces[activePieceIndex].maxHealth
         );
-        set({ coins: coins + 2 });
-        get().setMessage("You found loot! +2 HP, +2 coins");
+        get().setMessage("You found loot! +2 HP");
         break;
     }
 
@@ -208,7 +248,6 @@ export const useGameStore = create<GameState>((set, get) => ({
     });
   },
 
-  //TODO: buy potion, maybe add to an inventory
   buyItem: (item, cost) => {
     const { coins, playerInventory } = get();
     if (coins < cost) {
@@ -258,34 +297,6 @@ export const useGameStore = create<GameState>((set, get) => ({
     get().setMessage("No space to place new piece!");
   },
 
-  useItem: (itemIndex: number) => {
-    const { playerInventory, playerPieces, activePieceIndex } = get();
-    if (activePieceIndex === null) {
-      get().setMessage("Select a piece first!");
-      return;
-    }
-
-    const item = playerInventory[itemIndex];
-    if (!item) return;
-
-    const newInventory = [...playerInventory];
-    newInventory.splice(itemIndex, 1);
-
-    const newPieces = [...playerPieces];
-    const piece = newPieces[activePieceIndex];
-
-    if (item.itemType === "health") {
-      piece.health = Math.min(piece.health + 3, piece.maxHealth);
-      get().setMessage(`${piece.pieceType.toUpperCase()} healed +3 HP!`);
-    } else if (item.itemType === "wealth") {
-      get().setMessage("This piece now earns double coins!!!");
-    }
-
-    set({
-      playerInventory: newInventory,
-      playerPieces: newPieces,
-    });
-  },
 
   startNextLevel: () => {
     set({ level: get().level + 1, status: "playing" });
