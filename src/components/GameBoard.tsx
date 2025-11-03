@@ -1,6 +1,6 @@
 "use client";
 
-import { Stage, Layer, Rect, Group, Image as KonvaImage } from "react-konva";
+import { Stage, Layer, Rect, Group, Image as KonvaImage, Text } from "react-konva";
 import { useGameStore } from "@/store/useGameStore";
 import { useEffect, useMemo, useState } from "react";
 import { getValidMoves } from "@/utils/chessMoves";
@@ -99,6 +99,7 @@ export default function GameBoard() {
               pieceImage = images["health"];
             } else if (tile.type === "wall") {
               //TODO: find an image for obsacles 
+              pieceImage = null;
             } else if (tile.type === "player") {
               const player = playerPieces.find((p) => p.position[0] === tx && p.position[1] === ty);
               if (player) {
@@ -149,6 +150,14 @@ export default function GameBoard() {
                     offsetX={tileSize / 2}
                     offsetY={tileSize / 2}
                     alt="Chess piece"
+                  />
+                )}
+                {tile.type === "wall" && (
+                  <Text
+                    text="🧱"
+                    fontSize={tileSize * 0.8}
+                    x={tx * tileSize + boardBorder + tileSize / 4}
+                    y={ty * tileSize + boardBorder + tileSize / 4}
                   />
                 )}
               </Group>
