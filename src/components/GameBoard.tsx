@@ -54,7 +54,7 @@ export default function GameBoard() {
     };
 
     loadImages();
-  }, []);
+  }, [pieceImages]);
 
   useEffect(() => {
     if (board.length === 0) initBoard(8);
