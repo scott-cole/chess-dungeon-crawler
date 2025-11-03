@@ -21,7 +21,6 @@ export default function GameBoard() {
 
   const [images, setImages] = useState<Record<string, HTMLImageElement>>({});
 
-
   useEffect(() => {
     const pieceImages: Record<string, string> = {
       white_pawn: "/white_pawn.png",
@@ -99,6 +98,7 @@ export default function GameBoard() {
             } else if (tile.type === "health") {
               pieceImage = images["health"];
             } else if (tile.type === "wall") {
+              //TODO: find an image for obsacles 
             } else if (tile.type === "player") {
               const player = playerPieces.find((p) => p.position[0] === tx && p.position[1] === ty);
               if (player) {
