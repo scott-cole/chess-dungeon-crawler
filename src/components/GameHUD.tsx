@@ -5,6 +5,7 @@ import { useGameStore } from "@/store/useGameStore";
 export default function GameHUD() {
   const {
     playerPieces,
+    playerInventory,
     activePieceIndex,
     moveCount,
     maxMoves,
@@ -46,6 +47,7 @@ export default function GameHUD() {
                   />
                 </div>
               </div>
+              <div>{JSON.stringify(playerInventory)}</div>
             </div>
           );
         })}

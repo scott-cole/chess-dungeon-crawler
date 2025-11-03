@@ -4,7 +4,7 @@ import { create } from "zustand";
 import { getValidMoves } from "@/utils/chessMoves";
 
 export type TileType = "floor" | "player" | "wall" | "enemy" | "health";
-export type PotionType = "health" | "wealth";
+export type ItemType = "health" | "wealth";
 export type PieceType = "pawn" | "rook" | "bishop" | "knight" | "queen" | "king";
 
 export interface Tile {
@@ -15,8 +15,8 @@ export interface Tile {
 }
 
 //TODO: think of potion types and possible attributes
-export interface Potions {
-  type: PotionType;
+export interface Items {
+  itemType: ItemType;
   health?: number;
   coins?: number;
 }
@@ -31,6 +31,7 @@ export interface PlayerPiece {
 interface GameState {
   board: Tile[][];
   playerPieces: PlayerPiece[];
+  playerInventory: Items[],
   activePieceIndex: number | null;
   level: number;
   status: "menu" | "playing" | "won" | "lost" | "shop";
@@ -44,7 +45,7 @@ interface GameState {
   moveActivePieceTo: (nx: number, ny: number) => void;
   setMessage: (msg: string) => void;
   buyPiece: (piece: Exclude<PieceType, "pawn">, cost: number) => void;
-  buyPotion: (potion: PotionType, cost: number) => void;
+  buyItem: (potion: ItemType, cost: number) => void;
   startNextLevel: () => void;
   restartLevel: () => void;
 }
@@ -52,6 +53,7 @@ interface GameState {
 export const useGameStore = create<GameState>((set, get) => ({
   board: [],
   playerPieces: [],
+  playerInventory: [],
   activePieceIndex: null,
   level: 1,
   status: "menu",
@@ -207,10 +209,19 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   //TODO: buy potion, maybe add to an inventory
-  buyPotion: (potion, cost) => {
-    const { coins } = get();
+  buyItem: (item, cost) => {
+    const { coins, playerInventory } = get();
     if (coins < cost) {
       get().setMessage("No dollar my guy!");
+    }
+    const newItem: Items = { itemType: item };
+    if (newItem.itemType === "health") {
+      set({
+        coins: coins - cost,
+        playerInventory: [...playerInventory, newItem],
+      });
+      get().setMessage(`You bought a ${item} item`)
+      return;
     }
   },
 
