@@ -46,6 +46,7 @@ interface GameState {
   setMessage: (msg: string) => void;
   buyPiece: (piece: Exclude<PieceType, "pawn">, cost: number) => void;
   buyItem: (potion: ItemType, cost: number) => void;
+  useItem: (itemIndex: number) => void;
   startNextLevel: () => void;
   restartLevel: () => void;
 }
@@ -192,7 +193,6 @@ export const useGameStore = create<GameState>((set, get) => ({
       get().setMessage("Level complete! Visit the shop.");
     }
 
-    // if piece has 0 health remove from play
     const playerHealth = newPieces[activePieceIndex].health;
     if (playerHealth < 1) {
       newPieces.splice(activePieceIndex, 1);
@@ -248,6 +248,33 @@ export const useGameStore = create<GameState>((set, get) => ({
       }
     }
     get().setMessage("No space to place new piece!");
+  },
+
+  useItem: (itemIndex: number) => {
+    const { playerInventory, playerPieces, activePieceIndex } = get();
+    if (activePieceIndex === null) {
+      get().setMessage("Select a piece first!");
+      return;
+    }
+
+    const item = playerInventory[itemIndex];
+    if (!item) return;
+
+    const newInventory = [...playerInventory];
+    newInventory.splice(itemIndex, 1);
+
+    const newPieces = [...playerPieces];
+    const piece = newPieces[activePieceIndex];
+
+    if (item.itemType === "health") {
+      piece.health = Math.min(piece.health + 3, piece.maxHealth);
+      get().setMessage(`${piece.pieceType.toUpperCase()} healed +3 HP!`);
+    }
+
+    set({
+      playerInventory: newInventory,
+      playerPieces: newPieces,
+    });
   },
 
   startNextLevel: () => {

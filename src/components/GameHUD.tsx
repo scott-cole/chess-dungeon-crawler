@@ -65,7 +65,11 @@ export default function GameHUD() {
         <div className="flex flex-wrap gap-2">
           {playerInventory.length > 0 ? (
             playerInventory.map((item, index) => (
-              <div key={index} className="flex items-center gap-2">
+              <div
+                key={index}
+                className="flex items-center gap-2 cursor-pointer hover:scale-110 transition-transform"
+                onClick={() => useGameStore.getState().useItem(index)}
+              >
                 <Image
                   src={itemImages[item.itemType]}
                   alt={item.itemType}
