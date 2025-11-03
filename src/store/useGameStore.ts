@@ -1,3 +1,5 @@
+//TODO: split this out into smaller stores for better dev ex
+
 import { create } from "zustand";
 import { getValidMoves } from "@/utils/chessMoves";
 
@@ -10,6 +12,13 @@ export interface Tile {
   position: [number, number];
   pieceType?: PieceType;
   hp?: number;
+}
+
+//TODO: think of potion types and possible attributes
+export interface Potions {
+  type: PotionType;
+  health?: number;
+  coins?: number;
 }
 
 export interface PlayerPiece {
@@ -197,6 +206,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     });
   },
 
+  //TODO: buy potion, maybe add to an inventory
   buyPotion: (potion, cost) => {
     const { coins } = get();
     if (coins < cost) {
