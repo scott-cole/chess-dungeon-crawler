@@ -155,9 +155,11 @@ export default function GameBoard() {
                 {tile.type === "wall" && (
                   <Text
                     text="🧱"
-                    fontSize={tileSize * 0.8}
-                    x={tx * tileSize + boardBorder + tileSize / 4}
-                    y={ty * tileSize + boardBorder + tileSize / 4}
+                    fontSize={tileSize * 0.7}
+                    x={tx * tileSize + boardBorder + tileSize / 2}
+                    y={ty * tileSize + boardBorder + tileSize / 2}
+                    offsetX={tileSize / 0.7}
+                    offsetY={tileSize / 0.7}
                   />
                 )}
               </Group>
